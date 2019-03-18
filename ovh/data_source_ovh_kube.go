@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -23,9 +22,9 @@ func dataSourceKube() *schema.Resource {
 				Computed: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					err := validateStringEnum(v.(string), []string{
-                        "INSTALLING", "UPDATING", "RESETTING", "SUSPENDING", "REOPENING", "DELETING",
-                        "SUSPENDED", "ERROR", "USER_ERROR", "USER_QUOTA_ERROR", "READY",
-                    })
+						"INSTALLING", "UPDATING", "RESETTING", "SUSPENDING", "REOPENING", "DELETING",
+						"SUSPENDED", "ERROR", "USER_ERROR", "USER_QUOTA_ERROR", "READY",
+					})
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -68,7 +67,7 @@ func dataSourceKube() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-            "isUpToDate": {
+			"isUpToDate": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -78,19 +77,18 @@ func dataSourceKube() *schema.Resource {
 }
 
 type Kube struct {
-    Url                       string                          `json:"url"`
-	Status                    string                          `json:"status"`
-	Name                      string                          `json:"name"`
-    NodesUrl                  string                          `json:"nodesUrl"`
-    CreatedAt                 string                          `json:"createdAt"`
-    UpdatePolicy              string                          `json:"updatePolicy"`
-    Version                   string                          `json:"version"`
-    UpdatedAt                 string                          `json:"updatedAt"`
-    Id                        string                          `json:"id"`
-    IsUpToDate                bool                            `json:"isUpToDate"`
-    ControlPlaneIsUpToDate    bool                            `json:"controlPlaneIsUpToDate"`
+	Url                    string `json:"url"`
+	Status                 string `json:"status"`
+	Name                   string `json:"name"`
+	NodesUrl               string `json:"nodesUrl"`
+	CreatedAt              string `json:"createdAt"`
+	UpdatePolicy           string `json:"updatePolicy"`
+	Version                string `json:"version"`
+	UpdatedAt              string `json:"updatedAt"`
+	Id                     string `json:"id"`
+	IsUpToDate             bool   `json:"isUpToDate"`
+	ControlPlaneIsUpToDate bool   `json:"controlPlaneIsUpToDate"`
 }
-
 
 func dataSourceKubeRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
@@ -103,9 +101,8 @@ func dataSourceKubeRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error calling /kube:\n\t %q", err)
 	}
 
-
+	kube := &Kube{}
 	for _, serviceName := range response {
-		kube := &Kube{}
 		err := config.OVHClient.Get(fmt.Sprintf("/kube/%s", serviceName), &kube)
 
 		if err != nil {
@@ -139,9 +136,6 @@ func dataSourceKubeRead(d *schema.ResourceData, meta interface{}) error {
 		if v, ok := d.GetOk("id"); ok && v.(string) != kube.Id {
 			continue
 		}
-		if v, ok := d.GetOk("state"); ok && v.(string) != iplb.State {
-			continue
-		}
 		if v, ok := d.GetOk("isUpToDate"); ok && v.(bool) != kube.IsUpToDate {
 			continue
 		}
@@ -157,10 +151,7 @@ func dataSourceKubeRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("version", kube.Version)
 	d.Set("updatedAt", kube.UpdatedAt)
 	d.Set("id", kube.Id)
-	d.Set("state", kube.State)
 	d.Set("isUpToDate", kube.IsUpToDate)
 
 	return nil
 }
-
-

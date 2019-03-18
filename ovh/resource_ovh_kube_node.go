@@ -3,22 +3,21 @@ package ovh
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
 type OvhKubeNode struct {
-	CreatedAt   string `json:"createdAt"`
-	Id          string `json:"id"`
-	InstanceId  string `json:"instanceId,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Version     string `json:"version"`
-	IsUpToDate  bool   `json:"isUpToDate"`
-	UpdatedAt   string `json:"updatedAt"`
-	Flavor      string `json:"flavor"`
-	Status      string `json:"status"`
-	ProjectId   string `json:"projectId"`
+	CreatedAt  string `json:"createdAt"`
+	Id         string `json:"id"`
+	InstanceId string `json:"instanceId,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Version    string `json:"version"`
+	IsUpToDate bool   `json:"isUpToDate"`
+	UpdatedAt  string `json:"updatedAt"`
+	Flavor     string `json:"flavor"`
+	Status     string `json:"status"`
+	ProjectId  string `json:"projectId"`
 }
 
 func resourceOvhKubeNode() *schema.Resource {
@@ -66,9 +65,9 @@ func resourceOvhKubeNode() *schema.Resource {
 				Computed: true,
 				ValidateFunc: func(v interface{}, k string) (ws []string, errors []error) {
 					err := validateStringEnum(v.(string), []string{
-                        "INSTALLING", "UPDATING", ,"RESETTING", "SUSPENDING", "REOPENING", "DELETING", "SUSPENDED",
-                        "ERROR", "USER_ERROR", "USER_QUOTA_ERROR", "USER_NODE_NOT_FOUND_ERROR", "USER_NODE_SUSPENDED_SERVICE", "READY",
-                    })
+						"INSTALLING", "UPDATING", "RESETTING", "SUSPENDING", "REOPENING", "DELETING", "SUSPENDED",
+						"ERROR", "USER_ERROR", "USER_QUOTA_ERROR", "USER_NODE_NOT_FOUND_ERROR", "USER_NODE_SUSPENDED_SERVICE", "READY",
+					})
 					if err != nil {
 						errors = append(errors, err)
 					}
@@ -87,9 +86,9 @@ func resourceOvhKubeNodeCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Config)
 
 	newKubeNode := &OvhKubeNode{
-		ProjectId:   d.Get("projectId").(string),
-		Flavor:      d.Get("flavor").(string),
-		Name:        d.Get("name").(string),
+		ProjectId: d.Get("projectId").(string),
+		Flavor:    d.Get("flavor").(string),
+		Name:      d.Get("name").(string),
 	}
 
 	log.Printf("[DEBUG] OVH Kubernetes node create configuration: %#v", newKubeNode)
@@ -110,7 +109,7 @@ func resourceOvhKubeNodeCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[INFO] OVH Kubernetes Node ID: %s", d.Id())
 
-    //	if err := ovhDomainZoneRefresh(d, meta); err != nil {
+	//	if err := ovhDomainZoneRefresh(d, meta); err != nil {
 	//	log.Printf("[WARN] OVH Domain zone refresh after redirection creation failed: %s", err)
 	//}
 
@@ -122,24 +121,14 @@ func resourceOvhKubeNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	kubenode := OvhKubeNode{}
 	err := provider.OVHClient.Get(
-		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("projectId").(string), d.Id().(string)),
-		&redirection,
+		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("projectId").(string), d.Id()),
+		&kubenode,
 	)
 
 	if err != nil {
 		d.SetId("")
 		return nil
 	}
-	createdAt   string `json:"createdAt"`
-	Id          string `json:"id"`
-	InstanceId  string `json:"instanceId,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Version     string `json:"version"`
-	IsUpToDate  bool   `json:"isUpToDate"`
-	UpdatedAt   string `json:"updatedAt"`
-	Flavor      string `json:"flavor"`
-	Status      string `json:"status"`
-	ProjectId   string `json:"projectId"`
 
 	d.Set("createdAt", kubenode.CreatedAt)
 	d.Set("id", kubenode.Id)
@@ -152,13 +141,13 @@ func resourceOvhKubeNodeRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("status", kubenode.Status)
 	d.Set("projectId", kubenode.ProjectId)
 
-    return nil
+	return nil
 }
 
 func resourceOvhKubeNodeDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Config)
 
-    log.Printf("[INFO] Deleting OVH Kubernetes node in: %s, id: %s", d.Get("serviceName").(string), d.Id())
+	log.Printf("[INFO] Deleting OVH Kubernetes node in: %s, id: %s", d.Get("serviceName").(string), d.Id())
 
 	err := provider.OVHClient.Delete(
 		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("projectId").(string), d.Id()),
@@ -175,5 +164,3 @@ func resourceOvhKubeNodeDelete(d *schema.ResourceData, meta interface{}) error {
 
 	return nil
 }
-
-

@@ -50,6 +50,7 @@ func Provider() terraform.ResourceProvider {
 			"ovh_iploadbalancing":            dataSourceIpLoadbalancing(),
 			"ovh_me_paymentmean_bankaccount": dataSourceMePaymentmeanBankaccount(),
 			"ovh_me_paymentmean_creditcard":  dataSourceMePaymentmeanCreditcard(),
+			"ovh_kube":                       dataSourceKube(),
 
 			// Legacy naming schema (new datasources should not be added here)
 			"ovh_publiccloud_region":  dataSourcePublicCloudRegion(),
@@ -66,6 +67,7 @@ func Provider() terraform.ResourceProvider {
 			"ovh_domain_zone_record":              resourceOvhDomainZoneRecord(),
 			"ovh_domain_zone_redirection":         resourceOvhDomainZoneRedirection(),
 			"ovh_ip_reverse":                      resourceOvhIpReverse(),
+			"ovh_kube_node":                       resourceOvhKubeNode(),
 			// New naming schema (issue #23)
 			"ovh_cloud_network_private":        resourcePublicCloudPrivateNetwork(),
 			"ovh_cloud_network_private_subnet": resourcePublicCloudPrivateNetworkSubnet(),
