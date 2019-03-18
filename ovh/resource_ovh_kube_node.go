@@ -27,37 +27,40 @@ func resourceOvhKubeNode() *schema.Resource {
 		Delete: resourceOvhDomainZoneRedirectionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"createdAt": {
+			"created_at": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
-			"id": {
+			"instance_id": {
 				Type:     schema.TypeString,
 				Optional: true,
-			},
-			"instanceId": {
-				Type:     schema.TypeString,
-				Required: true,
+				Computed: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+				Computed: true,
 			},
 			"version": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
-			"isUpToDate": {
+			"is_up_to_date": {
 				Type:     schema.TypeBool,
 				Optional: true,
+				Computed: true,
 			},
-			"updatedAt": {
+			"updated_at": {
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 			},
 			"flavor": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Required: true,
+				ForceNew: true,
 			},
 			"status": {
 				Type:     schema.TypeString,
@@ -74,9 +77,10 @@ func resourceOvhKubeNode() *schema.Resource {
 					return
 				},
 			},
-			"projectId": {
+			"project_id": {
 				Type:     schema.TypeString,
-				Optional: true,
+				Required: true,
+				ForceNew: true,
 			},
 		},
 	}
@@ -86,7 +90,7 @@ func resourceOvhKubeNodeCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Config)
 
 	newKubeNode := &OvhKubeNode{
-		ProjectId: d.Get("projectId").(string),
+		ProjectId: d.Get("project_id").(string),
 		Flavor:    d.Get("flavor").(string),
 		Name:      d.Get("name").(string),
 	}
@@ -96,7 +100,7 @@ func resourceOvhKubeNodeCreate(d *schema.ResourceData, meta interface{}) error {
 	resultKubeNode := OvhKubeNode{}
 
 	err := provider.OVHClient.Post(
-		fmt.Sprintf("/kube/%s/publiccloud/node", d.Get("projectId").(string)),
+		fmt.Sprintf("/kube/%s/publiccloud/node", d.Get("project_id").(string)),
 		newKubeNode,
 		&resultKubeNode,
 	)
@@ -121,7 +125,7 @@ func resourceOvhKubeNodeRead(d *schema.ResourceData, meta interface{}) error {
 
 	kubenode := OvhKubeNode{}
 	err := provider.OVHClient.Get(
-		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("projectId").(string), d.Id()),
+		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("project_id").(string), d.Id()),
 		&kubenode,
 	)
 
@@ -130,8 +134,8 @@ func resourceOvhKubeNodeRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
+	d.SetId(kubenode.Id)
 	d.Set("createdAt", kubenode.CreatedAt)
-	d.Set("id", kubenode.Id)
 	d.Set("instanceId", kubenode.InstanceId)
 	d.Set("name", kubenode.Name)
 	d.Set("version", kubenode.Version)
@@ -147,10 +151,10 @@ func resourceOvhKubeNodeRead(d *schema.ResourceData, meta interface{}) error {
 func resourceOvhKubeNodeDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*Config)
 
-	log.Printf("[INFO] Deleting OVH Kubernetes node in: %s, id: %s", d.Get("serviceName").(string), d.Id())
+	log.Printf("[INFO] Deleting OVH Kubernetes node in: %s, id: %s", d.Get("service_name").(string), d.Id())
 
 	err := provider.OVHClient.Delete(
-		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("projectId").(string), d.Id()),
+		fmt.Sprintf("/kube/%s/publiccloud/node/%s", d.Get("project_id").(string), d.Id()),
 		nil,
 	)
 

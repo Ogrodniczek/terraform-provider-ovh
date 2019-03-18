@@ -36,18 +36,18 @@ func dataSourceKube() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"nodesUrl": {
+			"nodes_url": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"createdAt": {
+			"created_at": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"updatePolicy": {
+			"update_policy": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -57,17 +57,12 @@ func dataSourceKube() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
-			"updatedAt": {
+			"updated_at": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-			"isUpToDate": {
+			"is_up_to_date": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -118,40 +113,36 @@ func dataSourceKubeRead(d *schema.ResourceData, meta interface{}) error {
 		if v, ok := d.GetOk("name"); ok && v.(string) != kube.Name {
 			continue
 		}
-		if v, ok := d.GetOk("nodesUrl"); ok && v.(string) != kube.NodesUrl {
+		if v, ok := d.GetOk("nodes_url"); ok && v.(string) != kube.NodesUrl {
 			continue
 		}
-		if v, ok := d.GetOk("createdAt"); ok && v.(string) != kube.CreatedAt {
+		if v, ok := d.GetOk("created_at"); ok && v.(string) != kube.CreatedAt {
 			continue
 		}
-		if v, ok := d.GetOk("updatePolicy"); ok && v.(string) != kube.UpdatePolicy {
+		if v, ok := d.GetOk("update_policy"); ok && v.(string) != kube.UpdatePolicy {
 			continue
 		}
 		if v, ok := d.GetOk("version"); ok && v.(string) != kube.Version {
 			continue
 		}
-		if v, ok := d.GetOk("updatedAt"); ok && v.(string) != kube.UpdatedAt {
+		if v, ok := d.GetOk("updated_at"); ok && v.(string) != kube.UpdatedAt {
 			continue
 		}
-		if v, ok := d.GetOk("id"); ok && v.(string) != kube.Id {
-			continue
-		}
-		if v, ok := d.GetOk("isUpToDate"); ok && v.(bool) != kube.IsUpToDate {
+		if v, ok := d.GetOk("is_up_to_date"); ok && v.(bool) != kube.IsUpToDate {
 			continue
 		}
 	}
 
-	d.SetId(kube.Name)
+	d.SetId(kube.Id)
 	d.Set("url", kube.Url)
 	d.Set("status", kube.Status)
 	d.Set("name", kube.Name)
-	d.Set("nodesUrl", kube.NodesUrl)
-	d.Set("createdAt", kube.CreatedAt)
-	d.Set("updatePolicy", kube.UpdatePolicy)
+	d.Set("nodes_url", kube.NodesUrl)
+	d.Set("created_at", kube.CreatedAt)
+	d.Set("update_policy", kube.UpdatePolicy)
 	d.Set("version", kube.Version)
-	d.Set("updatedAt", kube.UpdatedAt)
-	d.Set("id", kube.Id)
-	d.Set("isUpToDate", kube.IsUpToDate)
+	d.Set("updated_at", kube.UpdatedAt)
+	d.Set("is_up_to_date", kube.IsUpToDate)
 
 	return nil
 }
